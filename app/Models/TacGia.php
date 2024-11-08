@@ -9,9 +9,15 @@ class TacGia extends Model
 {
     protected $table = 'tac_gia';
     protected $primaryKey = 'ma_tac_gia';
+    
+    protected $fillable = [
+        'ten',
+        'ho',
+        'ma_tac_gia'
+    ];
 
     public function sachs()
     {
-        return $this->belongsToMany(Sach::class, 'sach_tacgia', 'ma_tac_gia', 'ma_sach');
+        return $this->belongsToMany(Sach::class, 'sach_tac_gia', 'ma_tac_gia', 'ma_sach');
     }
 }
