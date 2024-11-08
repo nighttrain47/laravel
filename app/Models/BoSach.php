@@ -9,10 +9,15 @@ class BoSach extends Model
 {
     protected $table = 'bo_sach';
     protected $primaryKey = 'ma_bo_sach';
+    
+    protected $fillable = [
+        'ten_bo_sach',
+        'ma_bo_sach'
+    ];
 
     public function sachs()
     {
-        return $this->belongsToMany(Sach::class, 'sach_bo', 'ma_bo_sach', 'ma_sach');
+        return $this->belongsToMany(Sach::class, 'sach_bo_sach', 'ma_bo_sach', 'ma_sach');
     }
 }
 

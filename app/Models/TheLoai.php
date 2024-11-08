@@ -9,9 +9,14 @@ class TheLoai extends Model
 {
     protected $table = 'the_loai';
     protected $primaryKey = 'ma_the_loai';
+    
+    protected $fillable = [
+        'ten_the_loai',
+        'ma_the_loai'
+    ];
 
     public function sachs()
     {
-        return $this->belongsToMany(Sach::class, 'sach_theloai', 'ma_the_loai', 'ma_sach');
+        return $this->belongsToMany(Sach::class, 'sach_the_loai', 'ma_the_loai', 'ma_sach');
     }
 }
