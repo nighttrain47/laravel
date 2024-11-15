@@ -172,5 +172,13 @@
                 </div>
             </div>
         </div>
+        <!-- resources/views/welcome.blade.php -->
+        <form action="{{ route('search') }}" method="GET">
+            <input type="text" name="query" placeholder="Nhập từ khóa tìm kiếm...">
+            <button type="submit">Tìm kiếm</button>
+        </form>
+
+
+    
     </body>
 </html>
