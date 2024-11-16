@@ -16,7 +16,7 @@ class SearchController extends Controller
             ->orWhere('gioi_thieu', 'LIKE', "%{$query}%")
             ->get();
 
-        // Trả về kết quả tìm kiếm cho view hoặc dưới dạng JSON
-        return view('search.results', compact('results', 'query'));
+        // Trả về kết quả tìm kiếm dưới dạng JSON
+        return response()->json($results);
     }
 }
