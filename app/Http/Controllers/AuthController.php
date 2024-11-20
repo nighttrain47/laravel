@@ -14,7 +14,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        // Xác thực dữ liệu đầu vào
+       
         $request->validate([
             'email' => 'required|email',
             'password' => 'required|min:6',
@@ -23,11 +23,11 @@ class AuthController extends Controller
         $credentials = $request->only('email', 'password');
 
         if (Auth::attempt($credentials)) {
-            // Đăng nhập thành công
+            
             return redirect()->intended('/');
         }
 
-        // Đăng nhập thất bại
+       
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',
         ])->withInput($request->only('email'));
