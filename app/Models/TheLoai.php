@@ -9,6 +9,7 @@ class TheLoai extends Model
 {
     protected $table = 'the_loai';
     protected $primaryKey = 'ma_the_loai';
+    public $timestamps = false;
     
     protected $fillable = [
         'ten_the_loai',

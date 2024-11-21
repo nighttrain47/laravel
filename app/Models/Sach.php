@@ -9,6 +9,8 @@ class Sach extends Model
 {
     protected $table = 'sach';
     protected $primaryKey = 'ma_sach';
+
+    public $timestamps = false;
     
     protected $fillable = [
         'tieu_de',

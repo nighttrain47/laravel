@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class BoSach extends Model
 {
+    public $timestamps = false;
     protected $table = 'bo_sach';
     protected $primaryKey = 'ma_bo_sach';
     

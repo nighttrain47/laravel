@@ -11,6 +11,9 @@ use App\Models\BoSach;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
+
+
 
 // chay lenh ./vendor/bin/sail artisan serve
 // truy cap http://localhost/api/books
@@ -72,8 +75,8 @@ class BookController extends Controller
         }
     }
 
-    // yeu cau truy van sach theo id, tam thoi chua dung
-    public function show($id)
+    // yeu cau truy van sach theo id
+    public function getBookByID($id)
     {
         try {
             $book = Sach::with([
@@ -96,8 +99,8 @@ class BookController extends Controller
         }
     }
 
-    // yeu cau tao don hang moi, tam thoi chua dung
-    public function store(Request $request)
+    // yeu cau tao don hang moi
+    public function newOrder(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
@@ -161,8 +164,8 @@ class BookController extends Controller
         }
     }
 
-    // yeu cau cap nhat thong tin sach, tam thoi chua dung
-    public function update(Request $request, $id)
+    // yeu cau cap nhat thong tin sach
+    public function updateBook(Request $request, $id)
     {
         try {
             $book = Sach::findOrFail($id);
@@ -228,8 +231,8 @@ class BookController extends Controller
         }
     }
 
-    // yeu cau xoa sach, tam thoi chua dung
-    public function destroy($id)
+    // yeu cau xoa sach
+    public function deleteBook($id)
     {
         try {
             $book = Sach::findOrFail($id);
@@ -256,6 +259,120 @@ class BookController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Error deleting book: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // them tac gia moi
+    public function addNewAuthor(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'ten_tac_gia' => 'required|string|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $author = TacGia::create($request->all());
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Thêm tác giả thành công',
+                'data' => $author
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Có lỗi xảy ra khi thêm tác giả: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    // them the loai moi
+    public function addNewCategory(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'ten_the_loai' => 'required|string|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'error',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $category = TheLoai::create($request->all());
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Thêm thể loại thành công',
+                'data' => $category
+            ], 201);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Có lỗi xảy ra khi thêm thể loại'
+            ], 500);
+        }
+    }
+
+    // yeu cau them sach moi
+    public function addNewBook(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'tieu_de' => 'required|string|max:255|unique:sach,tieu_de',
+                'tong_so_trang' => 'nullable|integer|min:1',
+                'danh_gia' => 'nullable|numeric|between:0,5',
+                'ngay_xuat_ban' => 'required|date|before_or_equal:today',
+                'gia_tien' => 'required|numeric|min:0',
+                'so_tap' => 'nullable|numeric|min:1',
+                'gioi_thieu' => 'nullable|string|max:1000',
+                'ma_nha_xuat_ban' => 'required|exists:nha_xuat_ban,ma_nha_xuat_ban',
+                'tac_gias' => 'required|array|min:1',
+                'tac_gias.*' => 'exists:tac_gia,ma_tac_gia',
+                'the_loais' => 'required|array|min:1',
+                'the_loais.*' => 'exists:the_loai,ma_the_loai'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'status' => 'error', 
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            DB::beginTransaction();
+
+            $validatedData = $validator->validated();
+            $book = Sach::create($request->except(['tac_gias', 'the_loais']));
+
+            $book->tacGias()->attach($validatedData['tac_gias']);
+            $book->theLoais()->attach($validatedData['the_loais']);
+
+            DB::commit();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Thêm sách thành công',
+                'data' => $book->load(['tacGias', 'theLoais', 'nhaXuatBan'])
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Lỗi thêm sách: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Có lỗi xảy ra khi thêm sách'
             ], 500);
         }
     }

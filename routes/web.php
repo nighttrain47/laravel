@@ -11,8 +11,6 @@ use App\Http\Controllers\DataExportController;
 Route::get('/export-all-data', [DataExportController::class, 'exportAllData']);
 
 
-Route::get('/search', [SearchController::class, 'search'])->name('search');
-
 use App\Http\Controllers\AuthController;
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');

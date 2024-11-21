@@ -9,6 +9,8 @@ class TacGia extends Model
 {
     protected $table = 'tac_gia';
     protected $primaryKey = 'ma_tac_gia';
+
+    public $timestamps = false;
     
     protected $fillable = [
         'ten',
