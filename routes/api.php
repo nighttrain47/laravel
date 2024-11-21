@@ -8,6 +8,9 @@ use App\Http\Controllers\SearchController;
 // Authentication Routes
 Route::post('/signup', [AuthController::class, 'signup']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+});
 
 // Optional: Password Reset Routes
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);

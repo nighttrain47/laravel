@@ -75,4 +75,30 @@ class AuthController extends Controller
             ]
         ]);
     }
+
+    // chuc nang dang xuat bang cach xoa token dang nhap hien tai
+    public function logout(Request $request)
+    {
+        try {
+            if (!$request->user()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Unauthenticated'
+                ], 401);
+            }
+
+            $request->user()->currentAccessToken()->delete();
+
+            return response()->json([
+                'status' => true,
+                'message' => 'Token deleted'
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Logout failed',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
