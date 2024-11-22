@@ -15,7 +15,7 @@ class AuthController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users',
+            'username' => 'required|string|unique:users',
             'password' => 'required|string|min:8'
         ]);
 
@@ -28,7 +28,7 @@ class AuthController extends Controller
 
         $user = User::create([
             'name' => $request->name,
-            'email' => $request->email,
+            'username' => $request->username,
             'password' => Hash::make($request->password)
         ]);
 
@@ -37,43 +37,54 @@ class AuthController extends Controller
         return response()->json([
             'status' => true,
             'data' => [
-                'user' => $user,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'is_admin' => $user->is_admin ?? false
+                ],
                 'token' => $token
             ]
         ], 201);
     }
+    
     // chuc nang dang nhap
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email',
+            'username' => 'required|string',
             'password' => 'required|string'
         ]);
-
+    
         if ($validator->fails()) {
             return response()->json([
                 'status' => false,
                 'errors' => $validator->errors()
             ], 422);
         }
-
-        if (!Auth::attempt($request->only('email', 'password'))) {
+    
+        if (!Auth::attempt($request->only('username', 'password'))) {
             return response()->json([
                 'status' => false,
                 'message' => 'Invalid login details'
             ], 401);
         }
-
-        $user = User::where('email', $request['email'])->firstOrFail();
+    
+        $user = User::where('username', $request['username'])->firstOrFail();
         $token = $user->createToken('auth_token')->plainTextToken;
-
+    
         return response()->json([
             'status' => true,
             'data' => [
-                'user' => $user,
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'username' => $user->username,
+                    'is_admin' => $user->is_admin ?? false
+                ],
                 'token' => $token
             ]
-        ]);
+        ], 200);
     }
 
     // chuc nang dang xuat bang cach xoa token dang nhap hien tai

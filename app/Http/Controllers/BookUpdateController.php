@@ -193,38 +193,58 @@ class BookUpdateController extends Controller
                 'tac_gias' => 'required|array|min:1',
                 'tac_gias.*' => 'exists:tac_gia,ma_tac_gia',
                 'the_loais' => 'required|array|min:1',
-                'the_loais.*' => 'exists:the_loai,ma_the_loai'
+                'the_loais.*' => 'exists:the_loai,ma_the_loai',
             ]);
-
+    
             if ($validator->fails()) {
                 return response()->json([
                     'status' => 'error', 
                     'errors' => $validator->errors()
                 ], 422);
             }
-
+    
             DB::beginTransaction();
-
+    
             $validatedData = $validator->validated();
-            $book = Sach::create($request->except(['tac_gias', 'the_loais']));
-
+            
+            // Create book with specific fields
+            $book = Sach::create([
+                'tieu_de' => $validatedData['tieu_de'],
+                'tong_so_trang' => $validatedData['tong_so_trang'] ?? null,
+                'danh_gia' => $validatedData['danh_gia'] ?? null,
+                'ngay_xuat_ban' => $validatedData['ngay_xuat_ban'],
+                'gia_tien' => $validatedData['gia_tien'],
+                'so_tap' => $validatedData['so_tap'] ?? null,
+                'gioi_thieu' => $validatedData['gioi_thieu'] ?? null,
+                'ma_nha_xuat_ban' => $validatedData['ma_nha_xuat_ban'],
+            ]);
+    
+            // Attach relationships
             $book->tacGias()->attach($validatedData['tac_gias']);
             $book->theLoais()->attach($validatedData['the_loais']);
-
+    
             DB::commit();
-
+    
+            // Return with relationships
+            $book->load(['tacGias', 'theLoais', 'nhaXuatBan']);
+    
             return response()->json([
                 'status' => 'success',
                 'message' => 'Thêm sách thành công',
-                'data' => $book->load(['tacGias', 'theLoais', 'nhaXuatBan'])
+                'data' => $book
             ], 201);
-
+    
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Lỗi thêm sách: ' . $e->getMessage());
+            Log::error('Lỗi thêm sách: ' . $e->getMessage(), [
+                'request' => $request->all(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
             return response()->json([
                 'status' => 'error',
-                'message' => 'Có lỗi xảy ra khi thêm sách'
+                'message' => 'Có lỗi xảy ra khi thêm sách',
+                'debug' => config('app.debug') ? $e->getMessage() : null
             ], 500);
         }
     }
