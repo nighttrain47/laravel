@@ -8,6 +8,11 @@ use App\Http\Controllers\SearchController;
 // API Routes group with middleware
 Route::middleware('api')->group(function () {
     
+    // Public Routes (No auth required)
+    Route::get('/search', [SearchController::class, 'search']);
+    Route::get('/getAllBooks', [BookController::class, 'getAllBooks']);
+    Route::get('/getBookByID/{id}', [BookController::class, 'getBookByID']);
+
     // Authentication Routes (No auth required)
     Route::post('/signup', [AuthController::class, 'signup']);
     Route::post('/login', [AuthController::class, 'login']);
@@ -23,5 +28,4 @@ Route::middleware('api')->group(function () {
         Route::post('/addNewCategory', [BookUpdateController::class, 'addNewCategory']);
         Route::post('/deleteBookByID', [BookUpdateController::class, 'deleteBookByID']);
     });
-
 });
