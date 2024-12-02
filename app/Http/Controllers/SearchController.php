@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Sach;
 use Illuminate\Http\Request;
 
+// chuc nang tim kiem
 class SearchController extends Controller
 {
     public function search(Request $request)
